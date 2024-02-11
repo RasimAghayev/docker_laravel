@@ -22,4 +22,8 @@ nc -vz nginx 80
 docker-compose down
 
 
+--   03 Setting up Nginx---------------------------------------------
 
+
+docker-compose up -d
+docker-compose up -d --build

@@ -5,6 +5,22 @@ networks:
     name: laravel
 
 services:
+    
+  nginx:
+    # image: nginx:stable-alpine
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    container_name: nginx
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      # - ./src:/usr/share/nginx/html
+      - ./src:/var/www/html
+    networks:
+      - laravel
+
   php:
     image: php:8.3-fpm-alpine
     container_name: php
@@ -21,9 +37,3 @@ services:
       - MYSQL_USER=laravel
       - MYSQL_PASSWORD=secret
       - MYSQL_ROOT_PASSWORD=secret
-    
-  nginx:
-    image: nginx:stable-alpine
-    container_name: nginx
-    networks:
-      - laravel
