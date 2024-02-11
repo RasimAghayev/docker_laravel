@@ -1,0 +1,8 @@
+docker run hello-world
+
+docker run -it ubuntu bash
+
+docker build --tag testing:latest .
+
+docker run -it testing:latest /bin/bash
+
