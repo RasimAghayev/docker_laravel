@@ -1,3 +1,5 @@
+-- 01 Introduction to Docker----------------------------------
+
 docker run hello-world
 
 docker run -it ubuntu bash
@@ -5,5 +7,19 @@ docker run -it ubuntu bash
 docker build --tag testing:latest .
 
 docker run -it testing:latest /bin/bash
+
+
+--  02 Introduction to Docker Compose---------------------------------------------
+
+docker-compose up
+
+docker-compose ps
+
+nc -vz mysql 3306
+
+nc -vz nginx 80
+
+docker-compose down
+
 
 

@@ -1,0 +1,29 @@
+version: '3.8'
+
+networks:
+  laravel:
+    name: laravel
+
+services:
+  php:
+    image: php:8.3-fpm-alpine
+    container_name: php
+    networks:
+      - laravel
+
+  mysql:
+    image: mysql:8.3.0
+    container_name: mysql
+    networks:
+      - laravel
+    environment:
+      - MYSQL_DATABASE=laraveldb
+      - MYSQL_USER=laravel
+      - MYSQL_PASSWORD=secret
+      - MYSQL_ROOT_PASSWORD=secret
+    
+  nginx:
+    image: nginx:stable-alpine
+    container_name: nginx
+    networks:
+      - laravel
