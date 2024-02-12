@@ -6,27 +6,12 @@ networks:
 
 services:
     
-  # nginx:
-  #   # image: nginx:stable-alpine
-  #   build:
-  #     context: .
-  #     dockerfile: nginx.dockerfile
-  #   container_name: nginx
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   volumes:
-  #     # - ./src:/usr/share/nginx/html
-  #     - ./src:/var/www/html
-  #   networks:
-  #     - laravel
-    
-  apache:
+  nginx:
     # image: nginx:stable-alpine
     build:
       context: .
-      dockerfile: apache.dockerfile
-    container_name: apache
+      dockerfile: nginx.dockerfile
+    container_name: nginx
     ports:
       - 80:80
       - 443:443
@@ -35,10 +20,30 @@ services:
       - ./src:/var/www/html
     networks:
       - laravel
+    
+  # apache:
+  #   # image: nginx:stable-alpine
+  #   build:
+  #     context: .
+  #     dockerfile: apache.dockerfile
+  #   container_name: apache
+  #   ports:
+  #     - 80:80
+  #     - 443:443
+  #   volumes:
+  #     # - ./src:/usr/share/nginx/html
+  #     - ./src:/var/www/html
+  #   networks:
+  #     - laravel
 
   php:
-    image: php:8.3-fpm-alpine
+    # image: php:8.3-fpm-alpine
+    build:
+      context: .
+      dockerfile: php.dockerfile
     container_name: php
+    volumes:
+      - ./src:/var/www/html
     networks:
       - laravel
 
