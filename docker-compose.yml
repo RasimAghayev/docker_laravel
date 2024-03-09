@@ -90,3 +90,13 @@ services:
       - MYSQL_USER=laravel
       - MYSQL_PASSWORD=secret
       - MYSQL_ROOT_PASSWORD=secret
+
+  npm:
+    image: node:current-alpine
+    container_name: npm
+    volumes:
+      - ./src:/var/www/html
+    working_dir:  /var/www/html
+    entrypoint: ["npm"]
+    networks:
+      - laravel

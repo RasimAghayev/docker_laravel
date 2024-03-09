@@ -52,4 +52,11 @@ docker compose exec php php /var/www/html/artisan migrate
 docker compose run --rm artisan --version
 
 
+--    10 Setting up and using the npm service---------------------------------------------
+docker compose run --rm npm install
+
+
+
+
+
 
