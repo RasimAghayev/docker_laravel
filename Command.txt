@@ -28,3 +28,17 @@ docker-compose down
 docker-compose up -d
 docker-compose up -d --build
 
+
+--    07 Installing and using Composer---------------------------------------------
+
+
+docker-compose up -d nginx
+
+docker-compose run --rm composer --version
+
+docker-compose run --rm composer create-project laravel/laravel
+
+docker-compose up -d --build nginx
+
+
+

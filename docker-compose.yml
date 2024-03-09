@@ -12,6 +12,9 @@ services:
       context: .
       dockerfile: nginx.dockerfile
     container_name: nginx
+    depends_on:
+      - php
+      - mysql
     ports:
       - 80:80
       - 443:443
@@ -42,8 +45,19 @@ services:
       context: .
       dockerfile: php.dockerfile
     container_name: php
+    user: "0:0"
+    # command: bash -c "chmod o+w /var/www/html/storage/ -R"
     volumes:
       - ./src:/var/www/html
+    networks:
+      - laravel
+
+  composer:
+    image: composer:latest
+    container_name: composer
+    volumes:
+      - ./src:/var/www/html
+    working_dir:  /var/www/html
     networks:
       - laravel
 
