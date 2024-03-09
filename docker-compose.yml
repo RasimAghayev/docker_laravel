@@ -61,6 +61,21 @@ services:
     networks:
       - laravel
 
+  artisan:
+    # image: php:8.3-fpm-alpine
+    build:
+      context: .
+      dockerfile: php.dockerfile
+    container_name: php
+    user: "0:0"
+    # command: bash -c "chmod o+w /var/www/html/storage/ -R"
+    volumes:
+      - ./src:/var/www/html
+    working_dir:  /var/www/html
+    entrypoint: ["php","artisan"]
+    networks:
+      - laravel
+
   mysql:
     image: mysql:8.3.0
     container_name: mysql

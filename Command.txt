@@ -46,3 +46,10 @@ docker-compose up -d --build nginx
 docker compose exec php php /var/www/html/artisan --version
 
 docker compose exec php php /var/www/html/artisan migrate
+
+
+--    09 Setting up and using the Artisan service---------------------------------------------
+docker compose run --rm artisan --version
+
+
+
