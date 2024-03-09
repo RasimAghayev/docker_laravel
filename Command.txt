@@ -42,3 +42,7 @@ docker-compose up -d --build nginx
 
 
 
+--    08 Setting up our new Laravel app---------------------------------------------
+docker compose exec php php /var/www/html/artisan --version
+
+docker compose exec php php /var/www/html/artisan migrate
