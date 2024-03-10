@@ -1,11 +1,10 @@
-version: '3.8'
+version: "3.8"
 
 networks:
   laravel:
     name: laravel
 
 services:
-    
   nginx:
     # image: nginx:stable-alpine
     build:
@@ -23,7 +22,7 @@ services:
       - ./src:/var/www/html
     networks:
       - laravel
-    
+
   # apache:
   #   # image: nginx:stable-alpine
   #   build:
@@ -57,7 +56,7 @@ services:
     container_name: composer
     volumes:
       - ./src:/var/www/html
-    working_dir:  /var/www/html
+    working_dir: /var/www/html
     networks:
       - laravel
 
@@ -66,13 +65,26 @@ services:
     build:
       context: .
       dockerfile: php.dockerfile
-    container_name: php
+    container_name: artisan
     user: "0:0"
     # command: bash -c "chmod o+w /var/www/html/storage/ -R"
     volumes:
       - ./src:/var/www/html
-    working_dir:  /var/www/html
-    entrypoint: ["php","artisan"]
+    working_dir: /var/www/html
+    entrypoint: ["php", "artisan"]
+    networks:
+      - laravel
+
+  phpunit:
+    # image: php:8.3-fpm-alpine
+    build:
+      context: .
+      dockerfile: php.dockerfile
+    container_name: phpunit
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["/var/www/html/vendor/bin/phpunit"]
     networks:
       - laravel
 
@@ -96,7 +108,7 @@ services:
     container_name: npm
     volumes:
       - ./src:/var/www/html
-    working_dir:  /var/www/html
+    working_dir: /var/www/html
     entrypoint: ["npm"]
     networks:
       - laravel

@@ -79,3 +79,27 @@ docker compose run --rm artisan make:factory CommentFactory --model=Comment
 docker compose run --rm artisan db:seed
 
 
+
+--    12 Creating and running tests with PHPUnit---------------------------------------------
+
+docker compose run --rm artisan make:test PostTest --unit
+docker compose run --rm artisan test
+docker compose exec php /var/www/html/vendor/bin/phpunit
+docker compose run --rm phpunit
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
