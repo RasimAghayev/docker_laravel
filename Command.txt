@@ -50,13 +50,32 @@ docker compose exec php php /var/www/html/artisan migrate
 
 --    09 Setting up and using the Artisan service---------------------------------------------
 docker compose run --rm artisan --version
+docker compose run --rm artisan migrate
 
 
 --    10 Setting up and using the npm service---------------------------------------------
 docker compose run --rm npm install
 
 
+--    11 Building a simple test application---------------------------------------------
+docker compose run --rm artisan make:model Post --migration
+docker compose run --rm artisan make:model Comment --migration
+
+docker compose run --rm artisan make:controller PostController
+docker compose run --rm artisan make:controller CommentController
 
 
+docker compose run --rm artisan make:seeder UserSeeder
+docker compose run --rm artisan db:seed
+docker compose run --rm artisan tinker
+
+
+
+docker compose run --rm artisan make:seeder PostSeeder
+docker compose run --rm artisan make:seeder CommentSeeder
+docker compose run --rm artisan make:factory PostFactory --model=Post
+docker compose run --rm artisan make:factory CommentFactory --model=Comment
+
+docker compose run --rm artisan db:seed
 
 
