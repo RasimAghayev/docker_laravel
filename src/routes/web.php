@@ -1,8 +1,10 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\PostController;
 use App\Http\Controllers\CommentController;
+use App\Http\Controllers\PostController;
+use App\Models\Post;
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -15,10 +17,10 @@ use App\Http\Controllers\CommentController;
 */
 
 Route::get('/', function () {
-    return view('welcome');
+    return view('posts', ['posts' => Post::all()]);
 });
 
-Route::get('/posts', [PostController::class,'index']);
-Route::get('/posts/{post}', [PostController::class,'show']);
-Route::get('/posts/{post}/comments', [CommentController::class,'index']);
-Route::get('/posts/{post}/comments/{comment}', [CommentController::class,'show']);
+Route::get('/posts', [PostController::class, 'index']);
+Route::get('/posts/{post}', [PostController::class, 'show']);
+Route::get('/posts/{post}/comments', [CommentController::class, 'index']);
+Route::get('/posts/{post}/comments/{comment}', [CommentController::class, 'show']);

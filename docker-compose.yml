@@ -17,9 +17,10 @@ services:
     ports:
       - 80:80
       - 443:443
+      - 5173:5173
     volumes:
       # - ./src:/usr/share/nginx/html
-      - ./src:/var/www/html
+      - ./src:/var/www/html:delegated
     networks:
       - laravel
 
@@ -47,7 +48,7 @@ services:
     user: "0:0"
     # command: bash -c "chmod o+w /var/www/html/storage/ -R"
     volumes:
-      - ./src:/var/www/html
+      - ./src:/var/www/html:delegated
     networks:
       - laravel
 
@@ -110,5 +111,15 @@ services:
       - ./src:/var/www/html
     working_dir: /var/www/html
     entrypoint: ["npm"]
+    networks:
+      - laravel
+
+  npx:
+    image: node:current-alpine
+    container_name: npx
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["npx"]
     networks:
       - laravel
