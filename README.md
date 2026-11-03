@@ -1,4 +1,6 @@
 # docker_laravel
+![Views](https://hits.sh/github.com/RasimAghayev/docker_laravel.svg?label=views&color=0e75b6)
+
 
 A personal follow-along of a Docker course, built around a minimal Laravel
 app used purely as the course's "real project" example. This is Docker
