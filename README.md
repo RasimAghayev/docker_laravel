@@ -80,6 +80,26 @@ Run the test suite via the dedicated service:
 docker compose run --rm phpunit
 ```
 
+## Git hygiene
+
+This repository uses a pre-commit hook to scan for secrets with **gitleaks** before every commit.
+
+### Enable the hook
+
+```bash
+git config core.hooksPath .githooks
+```
+
+The hook runs `gitleaks protect --staged` via Docker. It requires **Docker** to be installed and running. If Docker is not available, the hook will block the commit with a clear error message.
+
+### Bypass (not recommended)
+
+```bash
+git commit --no-verify
+```
+
+> Policy forbids bypassing the hook except with explicit approval. Treat a secret found in staged changes as compromised — rotate it immediately.
+
 ## Known, disclosed, not fixed (out of scope for a course repo)
 
 - **`.env.example` ships a real-shaped `APP_KEY`** (not a placeholder) and

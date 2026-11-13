@@ -1,13 +1,32 @@
 ﻿#!/bin/sh
-# Pre-commit secret scan (gitleaks). Bypass forbidden by policy except explicit approval.
-if command -v gitleaks >/dev/null 2>&1; then
-  gitleaks protect --staged --redact --verbose
+# Pre-commit secret scan (gitleaks via Docker). Bypass forbidden by policy except explicit approval.
+# To enable: git config core.hooksPath .githooks
+
+repo_root=$(git rev-parse --show-toplevel)
+
+# Convert Windows path to Unix-style for Docker volume mount
+to_unix_path() {
+  case "$1" in
+    /[a-z]/*) echo "$1" ;; # already Unix-style
+    [A-Za-z]:*) echo "/${1:0:1}${1:2}" | sed 's/\\/\//g' ;;
+    *) echo "$1" ;;
+  esac
+}
+
+repo_unix=$(to_unix_path "$repo_root")
+
+# Use Docker to run gitleaks on staged changes
+if command -v docker >/dev/null 2>&1; then
+  docker run --rm \
+    -v "${repo_unix}:/repo" \
+    zricethezav/gitleaks:latest \
+    protect --staged --source /repo --redact --verbose
   status=$?
   if [ $status -ne 0 ]; then
     echo "gitleaks pre-commit scan failed; commit blocked." >&2
     exit $status
   fi
 else
-  echo "gitleaks not found in PATH; install it to enable pre-commit secret scanning." >&2
+  echo "Docker not found in PATH; install Docker to enable pre-commit secret scanning." >&2
   exit 1
 fi
