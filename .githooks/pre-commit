@@ -1,0 +1,13 @@
+﻿#!/bin/sh
+# Pre-commit secret scan (gitleaks). Bypass forbidden by policy except explicit approval.
+if command -v gitleaks >/dev/null 2>&1; then
+  gitleaks protect --staged --redact --verbose
+  status=$?
+  if [ $status -ne 0 ]; then
+    echo "gitleaks pre-commit scan failed; commit blocked." >&2
+    exit $status
+  fi
+else
+  echo "gitleaks not found in PATH; install it to enable pre-commit secret scanning." >&2
+  exit 1
+fi

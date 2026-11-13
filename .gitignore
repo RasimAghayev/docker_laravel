@@ -1,1 +1,34 @@
+﻿# OS/editor
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# IDE
+.idea/
+.vscode/
+
+# Environment / secrets
+.env
+.env.*
+!.env.example
+src/.env
+src/.env.*
+!src/.env.example
+
+# Dependencies
+vendor/
+node_modules/
+
+# Logs / cache
+*.log
+storage/
+bootstrap/cache/
+
+# Docker local data
 mysql/*
+!mysql/.gitkeep
+
+# Backups / state
+*.bak
