@@ -1,0 +1,35 @@
+# Version control
+.git
+.gitignore
+.gitattributes
+.github
+.githooks
+
+# IDE and editor artifacts
+.vscode
+.idea
+*.swp
+
+# Secrets and local environment
+**/.env
+**/.env.*
+!**/.env.example
+
+# Dependencies and build artifacts
+**/vendor
+**/node_modules
+**/public/build
+**/public/hot
+**/storage/*.key
+
+# Logs, caches and test artifacts
+**/*.log
+**/.phpunit.cache
+**/.phpunit.result.cache
+**/coverage.xml
+
+# Course material and docs not needed in the image
+Command.txt
+docs
+mysql
+projects

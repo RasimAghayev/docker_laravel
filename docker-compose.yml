@@ -1,125 +1,146 @@
-version: "3.8"
+name: ${COMPOSE_PROJECT_NAME:-docker_laravel-p5}
 
 networks:
   laravel:
-    name: laravel
+    name: ${COMPOSE_PROJECT_NAME:-docker_laravel-p5}-laravel
 
 services:
-  nginx:
-    # image: nginx:stable-alpine
-    build:
-      context: .
-      dockerfile: nginx.dockerfile
-    container_name: nginx
-    depends_on:
-      - php
-      - mysql
-    ports:
-      - 80:80
-      - 443:443
-      - 5173:5173
-    volumes:
-      # - ./src:/usr/share/nginx/html
-      - ./src:/var/www/html:delegated
-    networks:
-      - laravel
-
-  # apache:
-  #   # image: nginx:stable-alpine
-  #   build:
-  #     context: .
-  #     dockerfile: apache.dockerfile
-  #   container_name: apache
-  #   ports:
-  #     - 80:80
-  #     - 443:443
-  #   volumes:
-  #     # - ./src:/usr/share/nginx/html
-  #     - ./src:/var/www/html
-  #   networks:
-  #     - laravel
-
   php:
-    # image: php:8.3-fpm-alpine
     build:
       context: .
-      dockerfile: php.dockerfile
-    container_name: php
-    user: "0:0"
-    # command: bash -c "chmod o+w /var/www/html/storage/ -R"
-    volumes:
-      - ./src:/var/www/html:delegated
+      dockerfile: Dockerfile
+      target: runtime
+    image: docker_laravel-p5-app:local
+    env_file:
+      - path: .env
+        required: false
+    environment:
+      APP_ENV: ${APP_ENV:-local}
+      APP_DEBUG: ${APP_DEBUG:-true}
+      APP_KEY: ${APP_KEY:-}
+      APP_URL: ${APP_URL:-http://localhost:20220}
+      LOG_CHANNEL: ${LOG_CHANNEL:-stack}
+      LOG_LEVEL: ${LOG_LEVEL:-debug}
+      DB_CONNECTION: ${DB_CONNECTION:-mysql}
+      DB_HOST: ${DB_HOST:-mysql}
+      DB_PORT: ${DB_PORT:-3306}
+      DB_DATABASE: ${DB_DATABASE:-laraveldb}
+      DB_USERNAME: ${DB_USERNAME:-laravel}
+      DB_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set (copy .env.example to .env)}
+      CACHE_DRIVER: ${CACHE_DRIVER:-file}
+      SESSION_DRIVER: ${SESSION_DRIVER:-file}
+      QUEUE_CONNECTION: ${QUEUE_CONNECTION:-sync}
+    depends_on:
+      mysql:
+        condition: service_healthy
+    expose:
+      - "9000"
+    restart: unless-stopped
     networks:
       - laravel
 
-  composer:
-    image: composer:latest
-    container_name: composer
-    volumes:
-      - ./src:/var/www/html
-    working_dir: /var/www/html
-    networks:
-      - laravel
-
-  artisan:
-    # image: php:8.3-fpm-alpine
+  nginx:
     build:
       context: .
-      dockerfile: php.dockerfile
-    container_name: artisan
-    user: "0:0"
-    # command: bash -c "chmod o+w /var/www/html/storage/ -R"
-    volumes:
-      - ./src:/var/www/html
-    working_dir: /var/www/html
-    entrypoint: ["php", "artisan"]
-    networks:
-      - laravel
-
-  phpunit:
-    # image: php:8.3-fpm-alpine
-    build:
-      context: .
-      dockerfile: php.dockerfile
-    container_name: phpunit
-    volumes:
-      - ./src:/var/www/html
-    working_dir: /var/www/html
-    entrypoint: ["/var/www/html/vendor/bin/phpunit"]
+      dockerfile: Dockerfile
+      target: web
+    image: docker_laravel-p5-web:local
+    ports:
+      - "${WEB_PORT:-20220}:80"
+    depends_on:
+      php:
+        condition: service_healthy
+    restart: unless-stopped
     networks:
       - laravel
 
   mysql:
-    image: mysql:8.4.13
-    container_name: mysql
+    image: mysql:8.4.13@sha256:a81d043930e51745522bd5c430961cf8286f0a23f0a9a2a6e0108f7ea71b0902
+    environment:
+      MYSQL_DATABASE: ${DB_DATABASE:-laraveldb}
+      MYSQL_USER: ${DB_USERNAME:-laravel}
+      MYSQL_PASSWORD: ${DB_PASSWORD:?DB_PASSWORD must be set (copy .env.example to .env)}
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:?MYSQL_ROOT_PASSWORD must be set (copy .env.example to .env)}
     ports:
-      - 4306:3306
+      - "${DB_HOST_PORT:-20221}:3306"
     volumes:
-      - ./mysql:/var/lib/mysql
+      - mysql-data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -uroot -p$${MYSQL_ROOT_PASSWORD} --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 20s
+    restart: unless-stopped
     networks:
       - laravel
-    environment:
-      - MYSQL_DATABASE=laraveldb
-      - MYSQL_USER=laravel
-      - MYSQL_PASSWORD=secret
-      - MYSQL_ROOT_PASSWORD=secret
 
-  npm:
-    image: node:current-alpine
-    container_name: npm
+  composer:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    image: docker_laravel-p5-base:local
     volumes:
       - ./src:/var/www/html
     working_dir: /var/www/html
+    entrypoint: ["composer"]
+    profiles:
+      - tools
+    networks:
+      - laravel
+
+  artisan:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    image: docker_laravel-p5-base:local
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["php", "artisan"]
+    profiles:
+      - tools
+    networks:
+      - laravel
+
+  phpunit:
+    build:
+      context: .
+      dockerfile: Dockerfile
+      target: base
+    image: docker_laravel-p5-base:local
+    volumes:
+      - ./src:/var/www/html
+    working_dir: /var/www/html
+    entrypoint: ["/var/www/html/vendor/bin/phpunit"]
+    profiles:
+      - tools
+    networks:
+      - laravel
+
+  npm:
+    image: node:24-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5
+    volumes:
+      - ./src:/app
+    working_dir: /app
     entrypoint: ["npm"]
+    profiles:
+      - tools
     networks:
       - laravel
 
   npx:
-    image: node:current-alpine
-    container_name: npx
+    image: node:24-alpine@sha256:116b800c3754b440ee0aa3ed2f20f5bf3d99a554bfd9adeea09ea8017f6e85f5
     volumes:
-      - ./src:/var/www/html
-    working_dir: /var/www/html
+      - ./src:/app
+    working_dir: /app
     entrypoint: ["npx"]
+    profiles:
+      - tools
     networks:
       - laravel
+
+volumes:
+  mysql-data:
